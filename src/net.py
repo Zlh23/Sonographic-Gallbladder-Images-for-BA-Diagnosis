@@ -3,11 +3,11 @@
 # @ Time: 20-11-28 下午9:17
 from torch.utils import model_zoo
 from torchvision.models import resnet
-from src.net_base import *
+from net_base import *
 import torch.nn.functional as F
 import pretrainedmodels
 import torchvision
-from efficientnet_pytorch import EfficientNet
+#from efficientnet_pytorch import EfficientNet
 
 NUM_BLOCKS = {
     18: [2, 2, 2, 2],
@@ -216,7 +216,7 @@ class Densnet201(nn.Module):
 class Efficientnet(nn.Module):
     def __init__(self, num_classes=1000):
         super(Efficientnet, self).__init__()
-        self.features = EfficientNet.from_pretrained('efficientnet-b7')
+        #self.features = EfficientNet.from_pretrained('efficientnet-b7')
         self.features._fc = nn.Linear(2560, num_classes)
 
     def forward(self, x):

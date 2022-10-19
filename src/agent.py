@@ -6,15 +6,23 @@ from os.path import join
 import numpy as np
 import torch
 from tensorboardX import SummaryWriter
-from src import tool, logger
-from src import dataset as DataSet
-from src import net as Model
-from src import action as Action
+import tool, logger
+import dataset as DataSet
+import net as Model
+import action as Action
 
 
 class Trainer:
 
     def __init__(self, args):
+        seed = 1234567
+        # seed setting
+        torch.manual_seed(seed)  # 为CPU设置随机种子
+        torch.cuda.manual_seed(seed)  # 为当前GPU设置随机种子
+        torch.cuda.manual_seed_all(seed)
+
+        np.random.seed(seed)
+
         # cuda setting
         os.environ["CUDA_VISIBLE_DEVICES"] = args['cuda']
 
@@ -45,8 +53,8 @@ class Trainer:
         self.save_cm = args['save_cm']  # save confusion matrix
 
         # model name config
-        self.model_desc = '{}_{}_{}_{}'. \
-            format(args['dataset'], args['model'], args['action'], args['desc'])
+        self.model_desc = '{}'. \
+            format(args['desc'])
         self.model_pkl = self.model_desc + '.ckpt'
 
         # logger setup
@@ -63,8 +71,8 @@ class Trainer:
             state = torch.load(state_dir, map_location='cpu')
             self.model.load_state_dict(state['net'])
         self.model.cuda()
-        # self.action.save_graph(self.model, self.img_size, self.tblog,
-        #                        self.pblog)
+        self.action.save_graph(self.model, self.img_size, self.tblog,
+                                self.pblog)
 
         if torch.cuda.device_count() > 1:
             self.model = torch.nn.DataParallel(self.model)
@@ -80,6 +88,8 @@ class Trainer:
     def train(self):
         self.pblog.info(self.model_desc)
         optimizer = None
+
+
         for epoch in range(self.epoch):
             # get optimizer
             temp = self.action.update_opt(epoch, self.model, self.opt_type,
@@ -95,8 +105,17 @@ class Trainer:
             c_right = np.zeros(ll, np.float32)
             c_sum = np.zeros(ll, np.float32)
             main_loss = 0
+            i=0
             for idx, item in enumerate(self.dataloader.train):
                 tx, ty = item['image'], item['label']
+                # ZlhAdd: show image
+                if i == 0:
+                    a = tx
+                    #a = np.reshape(a, (-1,224, 224, 3))
+                    self.tblog.add_images("TrainImage", a, i)
+                    i = i + 1
+                    # ZlhEnd
+
                 tx, ty = tx.cuda(non_blocking=True), ty.cuda(non_blocking=True)
                 # get network output logits
                 logits = self.action.cal_logits(tx, self.model)
@@ -160,6 +179,7 @@ class Trainer:
         predictions = []
         for idx, item in enumerate(self.dataloader.eval):
             x, y = item['image'], item['label']
+
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
             logits = self.action.cal_logits(x, self.model)
             right_e, sum_e = self.action.cal_eval(y, logits)

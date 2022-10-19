@@ -8,7 +8,7 @@ from os.path import join, exists
 from datetime import datetime
 import logging
 import logging.handlers
-from src import config, tool
+import config, tool
 
 pblog = None
 

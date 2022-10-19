@@ -4,7 +4,7 @@
 import argparse
 import os
 from os.path import exists
-from src import config
+import config
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools

@@ -10,7 +10,7 @@ import torchvision
 import torch.utils.data as Data
 from torchvision import transforms
 from torchvision.datasets import ImageFolder
-from src import gallbladder_dataset
+import gallbladder_dataset
 
 
 class BaseLoader:
@@ -261,12 +261,15 @@ class Gallbladder(BaseLoader):
     def dataset_train(self):
         if self._dataset_train is None:
             tf = transforms.Compose([
-                # transforms.Resize((self.img_size, self.img_size)),
+                # zlhAdd gray to tgb
+                self.gray_to_rgb,
+                # zlhAddEnd
+                transforms.Resize((self.img_size, self.img_size)),
                 transforms.RandomResizedCrop(self.img_size, scale=(0.8, 1)),
                 transforms.RandomHorizontalFlip(),
                 # transforms.RandomHorizontalFlip(),
                 # transforms.RandomVerticalFlip(),
-                # transforms.ColorJitter(0.02, 0.02, 0.02, 0.01),
+                transforms.ColorJitter(0.02, 0.02, 0.02, 0.01),
                 # transforms.RandomRotation([-180, 180]),
                 # transforms.RandomAffine([-180, 180], translate=[0.1, 0.1],
                 #                         scale=[0.7, 1.3]),
@@ -282,6 +285,7 @@ class Gallbladder(BaseLoader):
     @property
     def dataset_eval(self):
         if self._dataset_eval is None:
+            print("HERE")
             tf = transforms.Compose([
                 transforms.Resize((self.img_size, self.img_size)),
                 self.gray_to_rgb,

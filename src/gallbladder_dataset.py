@@ -30,6 +30,7 @@ class GallbladderDataset(Dataset):
         _, extension = os.path.splitext(self.frame.iloc[idx, 0])
         # print(extension)
         image = self.image_loader(img_path, extension)
+
         # print(image)
         label = int(self.frame.iloc[idx, 1])
         if self.transform is not None:

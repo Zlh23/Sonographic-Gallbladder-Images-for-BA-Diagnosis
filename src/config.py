@@ -2,7 +2,7 @@
 # @ Author: Alexis
 # @ Time: 20-11-28 下午9:17
 from os.path import join, dirname, abspath
-from src import tool
+import tool
 
 # Basic project info
 AUTHOR = "Youngy"
@@ -40,6 +40,7 @@ def init_path_config(main_file):
     # local
     gv['Gallbladder_train_dir'] = './data/training_data'
     gv['Gallbladder_test_dir'] = './data/test_data'
+
 
     # lab15
     # gv['Gallbladder_train_dir'] = '/data1/yangyang/project/pnasnet/data/DataSets/final_train'

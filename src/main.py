@@ -1,9 +1,14 @@
 # @ FileName: main.py
 # @ Author: Alexis
 # @ Time: 20-11-28 下午9:17
-from src import config, agent, logger
+import config, agent, logger
 
 if __name__ == '__main__':
+    import ssl
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+
+
     config.init_path_config(__file__)  # __file__当前文件的绝对路径
     pblog = logger.get_pblog(total=config.epoch)
     try:
@@ -36,7 +41,7 @@ if __name__ == '__main__':
                     'lr_epoch': config.lr_epoch,
                     'no_eval': config.no_eval,
                     'personal_eval': config.personal_eval,
-                    'save_cm': config.save_cm}
+                    'save_cm': True}
             agent.Trainer(args).train()
         else:
             raise ValueError('No cmd: {}'.format(config.cmd))
